@@ -1,3 +1,27 @@
 :root {
+	--main: #0c8;
+	--bg: #fff;
+}
 
+body {
+	margin: 0;
+	background-color: var(--bg);
+}
+
+#board {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 300px;
+	height: 300px;
+	background-color: var(--main);
+}
+
+.box {
+	box-sizing: border-box;
+	border: 1px solid white;
+	width: calc(100% / 3);
+	height: calc(100% / 3);
+	float: left;
 }
