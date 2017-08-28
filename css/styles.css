@@ -16,12 +16,30 @@ body {
 	width: 300px;
 	height: 300px;
 	background-color: var(--main);
+	cursor: pointer;
 }
 
 .box {
 	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	border: 1px solid white;
 	width: calc(100% / 3);
 	height: calc(100% / 3);
 	float: left;
+}
+
+.x:after, .o:after {
+	font-family: "Helvetica Neue", sans-serif;
+	font-size: 100px;
+	color: var(--bg);
+}
+
+.x:after {
+	content: "X";
+}
+
+.o:after {
+	content: "O";
 }
