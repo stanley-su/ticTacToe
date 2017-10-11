@@ -16,6 +16,7 @@ CONTROLLER.init = function() {
 GAME.init = function() {
 	this.board = new Array(9).fill(null);
 	this.currTurn = 'X';
+	this.totalTurns = 0;
 }
 
 GAME.getPlayer = function() {
@@ -26,8 +27,11 @@ GAME.getPlayer = function() {
 GAME.addMove = function(pos) {
 	// if desired position on board is vacant
 	if (!this.board[pos]) {
+		// add the move
 		this.board[pos] = this.currTurn;
+		// alternate current turn
 		this.currTurn = this.currTurn === 'X' ? 'O' : 'X';
+		// update the board
 		BOARD.update(this.board);
 	}
 }
@@ -41,19 +45,16 @@ GAME.getWinner = function(b) {
 		b[2] === b[4] && b[4] === b[6]) {
 		return b[4];
 	}
-
 	// check rows, columns and diagonals connected to top-left square
 	if (b[0] === b[1] && b[1] === b[2] ||
 		b[0] === b[3] && b[3] === b[6]) {
 		return b[0];
 	}
-
 	// check rows, columns and diagonals connected to bottom-right square
 	if (b[2] === b[5] && b[5] === b[8] ||
 		b[6] === b[7] && b[7] === b[8]) {
 		return b[8];
 	}
-
 	return null;
 }
 
@@ -73,3 +74,5 @@ APP.init = function() {
 	GAME.init();
 	BOARD.init();
 }
+
+APP.init();
