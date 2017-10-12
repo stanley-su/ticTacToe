@@ -14,7 +14,7 @@ CONTROLLER.init = function() {
 }
 
 GAME.init = function() {
-	this.board = new Array(9).fill(null);
+	this.board = new Array(9).fill(NaN);
 	this.currTurn = 'X';
 	this.totalTurns = 0;
 }
@@ -31,9 +31,13 @@ GAME.addMove = function(pos) {
 		this.board[pos] = this.currTurn;
 		this.currTurn = this.currTurn === 'X' ? 'O' : 'X';
 		BOARD.update(this.board);
+
+		let winner = this.getWinner(this.board);
 		// check if game has ended
-		if (this.getWinner() || this.totalTurns === 9) {
-			BOARD.endGame(this.board);
+		if (winner || this.totalTurns === 9) {
+			BOARD.endGame(this.board, winner);
+			this.init();
+			BOARD.init();
 		}
 	}
 }
@@ -42,25 +46,25 @@ GAME.addMove = function(pos) {
 GAME.getWinner = function(b) {
 	// check rows, columns and diagonals connected to centre square
 	if (b[3] === b[4] && b[4] === b[5]) {
-		return [3, 4, 5, b[4]];
+		return {coords: [3, 4, 5], winner: b[4]};
 	} else if (b[1] === b[4] && b[4] === b[7]) {
-		return [1, 4, 7, b[4]];
+		return {coords: [1, 4, 7], winner: b[4]};
 	} else if (b[0] === b[4] && b[4] === b[8]) {
-		return [0, 4, 8, b[4]];
+		return {coords: [0, 4, 8], winner: b[4]};
 	} else if (b[2] === b[4] && b[4] === b[6]) {
-		return [2, 4, 6, b[4]];
+		return {coords: [2, 4, 6], winner: b[4]};
 	}
 	// check rows, columns and diagonals connected to top-left square
 	if (b[0] === b[1] && b[1] === b[2]) {
-		return [0, 1, 2, b[1]];
+		return {coords: [0, 1, 2], winner: b[1]};
 	} else if (b[0] === b[3] && b[3] === b[6]) {
-		return [0, 3, 6, b[3]];
+		return {coords: [0, 3, 6], winner: b[3]};
 	}
 	// check rows, columns and diagonals connected to bottom-right square
 	if (b[2] === b[5] && b[5] === b[8]) {
-		return [2, 5, 8, b[5]];
+		return {coords: [2, 5, 8], winner: b[5]};
 	} else if (b[6] === b[7] && b[7] === b[8]) {
-		return [6, 7, 8, b[7];
+		return {coords: [6, 7, 8], winner: b[7]};
 	}
 	return null;
 }
@@ -76,9 +80,18 @@ BOARD.update = function(b) {
 	}
 }
 
-// displays the end game message 
-BOARD.endGame = function(b) {
-	// find the winner
+// displays the end game message
+BOARD.endGame = function(b, winner) {
+	if (winner) {
+		// only display the winning boxes
+		for (let i = 0; i < this.array.length; ++i) {
+			if (winner.coords.indexOf(i) === -1) {
+				this.array[i].textContent = '';
+			}
+		}
+	} else {
+		alert('draw');
+	}
 }
 
 APP.init = function() {

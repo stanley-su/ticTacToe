@@ -1,6 +1,6 @@
 :root {
 	--main: #0c8;
-	--bg: #fff;
+	--bg: #333;
 }
 
 body {
@@ -24,22 +24,8 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	border: 1px solid white;
+	border: 1px solid var(--bg);
 	width: calc(100% / 3);
 	height: calc(100% / 3);
 	float: left;
-}
-
-.x:after, .o:after {
-	font-family: "Helvetica Neue", sans-serif;
-	font-size: 100px;
-	color: var(--bg);
-}
-
-.x:after {
-	content: "X";
-}
-
-.o:after {
-	content: "O";
 }
