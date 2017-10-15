@@ -208,7 +208,7 @@ const APP = function() {
 			c.lineTo(canvas.width - offset, canvas.height / 3 * 2);
 			c.lineCap = "round";
 			c.lineWidth = 5;
-			c.strokeStyle = '#aaa';
+			c.strokeStyle = '#fff';
 			c.stroke();
 		}
 
