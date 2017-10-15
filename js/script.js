@@ -9,6 +9,7 @@ const APP = function() {
 
 	const CONTROLLER = function() {
 		canvas.addEventListener('click', function(e) {
+			console.log('desu');
 			// calculate row
 			let col = Math.floor(e.offsetX / (canvas.width / 3));
 			let row = Math.floor(e.offsetY / (canvas.height / 3));
@@ -69,8 +70,8 @@ const APP = function() {
 				let winner = getWinner();
 				// check if game has ended
 				if (winner || totalTurns === 9) {
-					BOARD.endGame(winner);
 					restart();
+					BOARD.endGame(winner);
 				}
 			}
 		}
@@ -86,17 +87,13 @@ const APP = function() {
 			let row = Math.floor(i / 3);
 			let col = i % 3;
 			symbols.push({x: topLeftCentre.x + (col * canvas.width / 3),
-							 y: topLeftCentre.y + (row * canvas.height / 3)});
+						  y: topLeftCentre.y + (row * canvas.height / 3)});
 		}
 
 		const restart = function() {
 			// delete all of the symbols
 			for (let i = 0; i < symbols.length; ++i) {
-				if (symbols[i].symbol) {
-					setTimeout(function() {
-						delete symbols[i].symbol;
-					}, 100);
-				}
+				delete symbols[i].symbol;
 			}
 		}
 
@@ -117,7 +114,7 @@ const APP = function() {
 			this.draw = function() {
 				c.beginPath();
 				c.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-				c.fillStyle = 'white';
+				c.fillStyle = '#0af';
 				c.fill();
 			}
 		}
@@ -156,7 +153,7 @@ const APP = function() {
 				c.beginPath();
 				c.arc(this.x1, this.y1, this.r, 0, Math.PI * 2);
 				c.arc(this.x2, this.y2, this.r, 0, Math.PI * 2);
-				c.fillStyle = 'white';
+				c.fillStyle = '#f00';
 				c.fill();
 			}
 		}
@@ -172,7 +169,7 @@ const APP = function() {
 			c.moveTo(10, canvas.height / 3 * 2);
 			c.lineTo(canvas.width - 10, canvas.height / 3 * 2);
 			c.lineCap = "round";
-			c.lineWidth = 1;
+			c.lineWidth = 5;
 			c.strokeStyle = '#aaa';
 			c.stroke();
 		}
@@ -184,7 +181,7 @@ const APP = function() {
 						delete symbols[i].symbol;
 					}
 				}
-				setTimeout(restart, 1000);
+				setTimeout(restart, 400);
 			} else {
 				restart();
 			}
@@ -197,12 +194,11 @@ const APP = function() {
 			drawBoard();
 			for (let i = 0; i < symbols.length; ++i) {
 				if (symbols[i].symbol) {
-					for (let n = 0; n < 3; ++n) {
+					for (let n = 0; n < 4; ++n) {
 						symbols[i].symbol.update();
 					}
 				}
 			}
-			
 		}		
 
 		return { symbols, nought, cross, update, endGame };
