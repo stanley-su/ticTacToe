@@ -9,7 +9,6 @@ const APP = function() {
 
 	const CONTROLLER = function() {
 		canvas.addEventListener('click', function(e) {
-			console.log('desu');
 			// calculate row
 			let col = Math.floor(e.offsetX / (canvas.width / 3));
 			let row = Math.floor(e.offsetY / (canvas.height / 3));
@@ -40,10 +39,12 @@ const APP = function() {
 		const getWinner = function() {
 			// check the board for all winning combinations
 			for (let i = 0; i < winCombos.length; ++i) {
-				let w = winCombos[i];
+				let combo = winCombos[i];
+				let player = board[combo[0]];
 				// if all of the winning combo's positions on the board are equal
-				if (w.every((val, i, arr) => board[val] === board[arr[0]])) {
-					return w;
+				if (combo.every((pos) => board[pos] === player)) {
+					// return object containing winning combo and palyer
+					return { combo, player };
 				}
 			}
 			return null;
@@ -81,6 +82,7 @@ const APP = function() {
 
 	const BOARD = function() {
 		const symbols = [];
+		let winningLine;
 		let topLeftCentre = {x: canvas.width / 6, y: canvas.height / 6};
 		for (let i = 0; i < 9; ++i) {
 			// store the current box's row and column
@@ -105,6 +107,7 @@ const APP = function() {
 			this.d = d;
 			this.r = r;
 			this.a = 0;
+			this.color = '#0af';
 			this.update = function() {
 				this.a += 0.05;
 				this.x = this.originX + this.d * Math.cos(this.a);
@@ -114,12 +117,13 @@ const APP = function() {
 			this.draw = function() {
 				c.beginPath();
 				c.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-				c.fillStyle = '#0af';
+				c.fillStyle = this.color;
 				c.fill();
 			}
 		}
 
 		const cross = function(x, y, d, r) {
+			// corners that the orbs will reach
 			this.tl = { x: x - d, y: y - d };
 			this.tr = { x: x + d, y: y - d};
 			this.bl = { x: x - d, y: y + d};
@@ -133,10 +137,11 @@ const APP = function() {
 			// velocity
 			this.v = 1;
 			this.r = r;
+			// variables that decide velocity's positivity
 			this.s1 = 1;
 			this.s2 = 1;
+			this.color = '#f00';
 			this.update = function() {
-				// variables that decide velocity's positivity
 				if (this.x1 > this.br.x || this.x1 < this.tl.x) {
 					this.s1 *= -1;
 				}
@@ -153,34 +158,73 @@ const APP = function() {
 				c.beginPath();
 				c.arc(this.x1, this.y1, this.r, 0, Math.PI * 2);
 				c.arc(this.x2, this.y2, this.r, 0, Math.PI * 2);
-				c.fillStyle = '#f00';
+				c.fillStyle = this.color;
 				c.fill();
 			}
 		}
 
+		// a line that moves from start to end in x amount of steps
+		const animatedLine = function(start, end, color, steps) {
+			this.originX = start.x;
+			this.originY = start.y;
+			// amount of updates for the line to be complete
+			this.steps = steps;
+			this.endX = end.x;
+			this.endY = end.y;
+			this.x = start.x;
+			this.y = start.y;
+			this.dx = (end.x - start.x) / this.steps;
+			this.dy = (end.y - start.y) / this.steps;
+			this.color = color;
+			// used to record how many times the line has grown
+			this.counter = 0;
+			this.update = function() {
+				this.x += this.dx;
+				this.y += this.dy;
+				this.draw();
+			}
+			this.draw = function() {
+				c.beginPath();
+				c.moveTo(this.originX, this.originY);
+				c.lineTo(this.x, this.y);
+				c.lineCap = "round";
+				c.lineWidth = 5;
+				c.strokeStyle = this.color;
+				c.stroke();
+			}
+		}
+
 		const drawBoard = function() {
+			// distance from borders of canvas
+			let offset = 10;
 			c.beginPath();
-			c.moveTo(canvas.width / 3, 10);
-			c.lineTo(canvas.width / 3, canvas.height - 10);
-			c.moveTo(canvas.width / 3 * 2, 10);
-			c.lineTo(canvas.width / 3 * 2, canvas.height - 10);
-			c.moveTo(10, canvas.height / 3);
-			c.lineTo(canvas.width - 10, canvas.height / 3);
-			c.moveTo(10, canvas.height / 3 * 2);
-			c.lineTo(canvas.width - 10, canvas.height / 3 * 2);
+			c.moveTo(canvas.width / 3, offset);
+			c.lineTo(canvas.width / 3, canvas.height - offset);
+			c.moveTo(canvas.width / 3 * 2, offset);
+			c.lineTo(canvas.width / 3 * 2, canvas.height - offset);
+			c.moveTo(offset, canvas.height / 3);
+			c.lineTo(canvas.width - offset, canvas.height / 3);
+			c.moveTo(offset, canvas.height / 3 * 2);
+			c.lineTo(canvas.width - offset, canvas.height / 3 * 2);
 			c.lineCap = "round";
 			c.lineWidth = 5;
 			c.strokeStyle = '#aaa';
 			c.stroke();
 		}
 
-		const endGame = function(w) {
-			if (w) {
+		const endGame = function(winner) {
+			if (winner) {
+				// only display winning combo
 				for (let i = 0; i < symbols.length; ++i) {
-					if (w.indexOf(i) === -1) {
+					if (winner.combo.indexOf(i) === -1) {
 						delete symbols[i].symbol;
 					}
 				}
+				let start = symbols[winner.combo[0]];
+				let end = symbols[winner.combo[2]];
+				let player = winner.player;
+				let playerColor = start.symbol.color;
+				winningLine = new animatedLine(start, end, playerColor, 30);
 				setTimeout(restart, 400);
 			} else {
 				restart();
@@ -197,6 +241,14 @@ const APP = function() {
 					for (let n = 0; n < 4; ++n) {
 						symbols[i].symbol.update();
 					}
+				}
+			}
+			if (winningLine) {
+				winningLine.update();
+				winningLine.counter += 1;
+				// if the winning
+				if (winningLine.counter > winningLine.steps) {
+					winningLine = undefined;
 				}
 			}
 		}		
